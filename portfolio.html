@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lekha Varisa — Neuroscience Researcher/Engineer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --cyan: #63a8b4;
+    --cyan-dim: rgba(0,212,255,0.13);
+    --cyan-glow: rgba(0,212,255,0.08);
+    --bg: #141414;
+    --bg2: #1c1c1cdc;
+    --bg3: #2222226b;
+    --text: #e8f4ff;
+    --text-dim: #afc5ca;
+    --border: rgba(238, 238, 238, 0.313);
+    --card-bg:rgba(0,212,255,0.15);
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: #1414145b; backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem; display: flex; align-items: center;
+    justify-content: space-between; height: 56px;
+  }
+  .nav-logo { font-size: 15px; font-weight: 600; color: var(--cyan); letter-spacing: 0.05em; }
+  .nav-links { display: flex; gap: 0; flex-wrap: wrap; }
+  .nav-links a {
+    font-size: 13px; color: var(--text-dim); text-decoration: none;
+    padding: 0.4rem 0.85rem; border-radius: 6px; transition: all 0.2s; cursor: pointer;
+  }
+  .nav-links a:hover { color: var(--cyan); background: var(--cyan-dim); }
+
+  /* BG CANVAS */
+  #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+  /* MAIN */
+  #main { position: relative; z-index: 1; }
+
+  /* SECTIONS */
+  .section-wrap { max-width: 1100px; margin: 0 auto; padding: 7rem 2rem 4rem; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+
+  /* HERO */
+  #hero { min-height: 100vh; display: flex; align-items: center; padding-top: 56px; }
+  .hero-inner { max-width: 1100px; margin: 0 auto; padding: 2rem; width: 100%; position: relative; }
+  .neural-canvas { position: absolute; top: -40px; right: -40px; width: 380px; height: 380px; opacity: 0.65; pointer-events: none; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+    color: var(--cyan); background: var(--cyan-dim); border: 1px solid var(--border);
+    padding: 5px 12px; border-radius: 20px; margin-bottom: 1.5rem; letter-spacing: 0.05em;
+  }
+  .hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+  .hero h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 700; line-height: 1.1; margin-bottom: 1rem; }
+  .hero h1 span { color: var(--cyan); }
+  .hero-sub { font-size: 1.05rem; color: var(--text-dim); max-width: 560px; line-height: 1.75; margin-bottom: 2rem; }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2.5rem; }
+  .tag { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); color: var(--text-dim); background: var(--bg2); }
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--cyan); color: var(--bg); font-size: 14px; font-weight: 600;
+    padding: 10px 24px; border-radius: 8px; border: none; cursor: pointer;
+    text-decoration: none; display: inline-block; transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-outline {
+    background: transparent; color: var(--cyan); font-size: 14px; font-weight: 500;
+    padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border);
+    cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s;
+  }
+  .btn-outline:hover { background: var(--cyan-dim); }
+
+  /* SECTION HEADERS */
+  .sec-header { margin-bottom: 2.5rem; }
+  .sec-label { font-size: 11px; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.5rem; }
+  .sec-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 600; }
+  .sec-title span { color: var(--cyan); }
+  .sec-line { width: 40px; height: 2px; background: var(--cyan); margin-top: 0.75rem; border-radius: 2px; }
+
+  /* RESEARCH GRID */
+  .research-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; }
+  .r-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.5rem; transition: transform 0.2s, border-color 0.2s;
+    cursor: default; position: relative; overflow: hidden;
+  }
+  .r-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .r-card:hover { transform: translateY(-3px); border-color: rgba(0,212,255,0.45); }
+  .r-card:hover::before { opacity: 1; }
+  .r-icon { font-size: 22px; margin-bottom: 0.75rem; }
+  .r-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+  .r-card p { font-size: 13.5px; color: var(--text-dim); line-height: 1.65; }
+
+  /*  CURRENT WORK */
+  .proj-list { display: flex; flex-direction: column; gap: 1rem; }
+  .proj-item {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.25rem 1.5rem; display: flex; gap: 1.25rem; align-items: flex-start;
+    transition: border-color 0.2s; cursor: default;
+  }
+  .proj-item:hover { border-color: rgba(0,212,255,0.4); }
+  .proj-num {
+    font-size: 11px; font-weight: 700; color: var(--cyan); background: var(--cyan-dim);
+    border: 1px solid var(--border); min-width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+  }
+  .proj-body h3 { font-size: 15px; font-weight: 600; margin-bottom: 0.3rem; }
+  .proj-body p { font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 0.6rem; }
+  .proj-techs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tech-tag {
+    font-size: 11px; padding: 3px 9px; border-radius: 12px;
+    background: rgba(0,212,255,0.1); color: var(--cyan); border: 1px solid rgba(0,212,255,0.25);
+  }
+
+  /* SKILLS */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+  .skill-group { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .skill-group h3 { font-size: 13px; font-weight: 600; color: var(--cyan); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .skill-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
+  .skill-name { font-size: 13px; color: var(--text); }
+  .skill-bar-wrap { width: 100px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+  .skill-bar { height: 100%; background: var(--cyan); border-radius: 4px; width: 0; transition: width 1.2s ease; }
+
+    /* LAB AFFILIATIONS */
+  .lab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
+  .lab-card { background: var(--bg2); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1.5rem; transition: border-color 0.2s, transform 0.2s; }
+  .lab-card:hover { border-color: rgba(0,212,255,0.35); transform: translateY(-2px); }
+  .lab-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 1rem; }
+  .lab-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--cyan-dim); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .lab-title h3 { font-size: 14.5px; font-weight: 600; color: var(--text); margin-bottom: 2px; line-height: 1.4; }
+  .lab-pi { font-size: 12.5px; color: var(--cyan); margin-bottom: 2px; }
+  .location { font-size: 12px; color: var(--text-dim); }
+  
+  .lab-period { font-size: 12px; color: var(--text-dim); }
+  .lab-desc { font-size: 13px; color: var(--text-dim); line-height: 1.65; margin-bottom: 1rem; }
+  .lab-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .lab-link { display: flex; justify-content: center; font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); color: var(--cyan); text-decoration: none; background: var(--cyan-dim); transition: opacity 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+  .lab-link:hover { opacity: 0.75; }
+
+  /* PUBLICATIONS */
+  .pub-list { display: flex; flex-direction: column; gap: 1rem; }
+  .pub-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan); border-radius: 12px; padding: 1.25rem 1.5rem;
+  }
+  .pub-item h3 { font-size: 14.5px; font-weight: 600; margin-bottom: 0.4rem; line-height: 1.5; }
+  .pub-meta { font-size: 12.5px; color: var(--text-dim); margin-bottom: 0.4rem; }
+  .pub-badge {
+    display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    background: rgba(0,212,255,0.12); color: var(--cyan); border: 1px solid var(--border);
+  }
+
+  /* POSTERS */
+  .poster-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+  .poster-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; transition: transform 0.2s, border-color 0.2s; cursor: default;
+  }
+  .poster-card:hover { transform: translateY(-3px); border-color: rgba(0,212,255,0.45); }
+  .poster-thumb {
+    height: 140px; background: var(--bg3); display: flex; align-items: center;
+    justify-content: center; border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .poster-thumb svg { opacity: 0.45; }
+  .poster-thumb .p-label { position: absolute; font-size: 11px; color: var(--cyan); bottom: 10px; right: 12px; opacity: 0.75; }
+  .poster-info { padding: 1rem; }
+  .poster-info h3 { font-size: 13.5px; font-weight: 600; margin-bottom: 0.3rem; line-height: 1.45; }
+  .poster-info p { font-size: 12px; color: var(--text-dim); }
+
+  /* CV */
+  .cv-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .cv-col h3 { font-size: 13px; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; font-weight: 600; }
+  .cv-item { position: relative; padding-left: 1.25rem; margin-bottom: 1.5rem; }
+  .cv-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
+  .cv-item::after { content: ''; position: absolute; left: 2.5px; top: 14px; bottom: -14px; width: 1px; background: var(--border); }
+  .cv-item:last-child::after { display: none; }
+  .cv-item .role { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .cv-item .org { font-size: 13px; color: var(--cyan); margin-bottom: 2px; }
+  .cv-item .period { font-size: 12px; color: var(--text-dim); margin-bottom: 5px; }
+  .cv-item .desc { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+  .dl-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--cyan); color: var(--bg); font-size: 13px; font-weight: 600;
+    padding: 9px 20px; border-radius: 8px; border: none; cursor: pointer;
+    margin-top: 1.5rem; text-decoration: none; transition: opacity 0.2s;
+  }
+  .dl-btn:hover { opacity: 0.85; }
+
+  /* CONTACT */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+  .contact-text p { color: var(--text-dim); line-height: 1.7; margin-bottom: 1.5rem; font-size: 15px; }
+  .contact-links { display: flex; flex-direction: column; gap: 10px; }
+  .c-link {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    border: 1px solid var(--border); border-radius: 10px; background: var(--bg2);
+    text-decoration: none; color: var(--text); transition: border-color 0.2s; font-size: 14px;
+  }
+  .c-link:hover { border-color: var(--cyan); color: var(--cyan); }
+  .c-link .c-icon { color: var(--cyan); font-size: 14px; width: 22px; text-align: center; font-weight: 600; }
+  .contact-form { display: flex; flex-direction: column; gap: 10px; }
+  .contact-form input, .contact-form textarea {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; color: var(--text); font-size: 14px; font-family: inherit;
+    transition: border-color 0.2s; outline: none; resize: vertical;
+  }
+  .contact-form input:focus, .contact-form textarea:focus { border-color: var(--cyan); }
+  .contact-form textarea { min-height: 110px; }
+  .contact-form button {
+    background: var(--cyan); color: var(--bg); font-size: 14px; font-weight: 600;
+    padding: 11px; border-radius: 8px; border: none; cursor: pointer; transition: opacity 0.2s;
+  }
+  .contact-form button:hover { opacity: 0.85; }
+
+  /* FOOTER */
+  footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--text-dim); border-top: 1px solid var(--border); }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .neural-canvas { display: none; }
+    .cv-cols { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .nav-links a { padding: 0.4rem 0.5rem; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<nav>
+  <div class="nav-logo"></div>
+  <div class="nav-links">
+    <a href="#research">Research</a>
+    <a href="#current work">Current Work</a>
+    <a href="#skills">Skills</a>
+    <a href="#labs">Labs</a>
+    <a href="#posters">Posters</a>
+    <a href="#publications">Publications</a>
+    <a href="#cv">CV</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<div id="main">
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-inner">
+    <canvas class="neural-canvas" id="heroCanvas"></canvas>
+    <div class="hero-badge"><span class="dot"></span>Available for PhD &amp; Research Positions</div>
+    <h1>Lekha Varisa<br><span></span>Engineer/ Neuroscience Researcher</h1>
+    <p class="hero-sub">
+      Bridging electrical engineering, computer science, and systems neuroscience —
+      building data pipelines for intracranial EEG, analyzing single-unit recordings,
+      and probing the neural basis of affective cognition at Barrow Neurological Institute.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">M.S. Computer(Electrical) Engineering</span>
+      <span class="tag">iEEG · Single-Unit Analysis</span>
+      <span class="tag">Epilepsy · BCI</span>
+      <span class="tag">Barrow Neurological Institute</span>
+    </div>
+    <div class="hero-btns">
+      <a class="btn-primary" href="#contact">Get in Touch</a>
+      <a class="btn-outline" href="#research">View Research</a>
+      <a class="btn-outline" href="#cv">Download CV</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RESEARCH ═══ -->
+<section id="research">
+  <div class="section-wrap">
+    <div class="sec-header">
+      <div class="sec-label">01 — Research Interests</div>
+      <h2 class="sec-title">What I <span>Study</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="research-grid">
+      <div class="r-card">
+        <div class="r-icon">🎮</div>
+        <h3>Affective Task Switching & Cognitive Flexibility</h3>
+        <p>Investigating how the brain dynamically switches between emotional and non-emotional goals. Using intracranial recordings, I study how task context (emotion vs. gender) and cognitive control (switch vs. repeat) interact to shape neural representations and behavior.</p>
+      </div>
+      <div class="r-card">
+        <div class="r-icon">⚡</div>
+        <h3>Single-Unit Encoding & Mixed Selectivity</h3>
+        <p>Characterizing how individual neurons encode multiple task variables simultaneously (e.g., emotion × task transition). I focus on mixed selectivity, nonlinear encoding, and population-level representations in regions like the amygdala and pulvinar.</p>
+      </div>
+      
+      <div class="r-card">
+        <div class="r-icon">🧠</div>
+        <h3>Thalamocortical & Limbic Circuit Dynamics</h3>
+        <p>Exploring how the pulvinar and amygdala contribute to flexible cognition and emotional processing. I aim to understand how these regions coordinate during task switching and how they support adaptive behavior.</p>
+      </div>
+      <!-- <div class="r-card">
+        <div class="r-icon">💻</div>
+        <h3>Translational & Clinical Neuroscience</h3>
+        <p>Exploring how the pulvinar and amygdala contribute to flexible cognition and emotional processing. I aim to understand how these regions coordinate during task switching and how they support adaptive behavior.</p>
+      </div> -->
+       <div class="r-card">
+        <div class="r-icon">💻</div>
+        <h3>Neural Data Analysis & Computational Methods</h3>
+        <p>Developing analysis pipelines for spike trains and iEEG data, including time-frequency analysis, GLMs, decoding, and representational analyses to link neural activity with behavior.</p>
+      </div> 
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CURRENT WORK ═══ -->
+<section id="current work">
+  <div class="section-wrap">
+    <div class="sec-header">
+      <div class="sec-label">02 — CURRENT WORK</div>
+      <h2 class="sec-title">Current <span>Responsibilities</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="proj-list">
+      <div class="proj-item">
+        <div class="proj-num">01</div>
+
+        <div class="proj-body">
+          <h3>Single-Unit Spike Sorting &amp; Analysis</h3>
+          <p id="8q1x7m">Developed and maintained an automated spike-sorting pipeline using Osort, combined with manual curation for high-quality unit isolation. Performed downstream analyses including firing rate dynamics, inter-spike interval (ISI) distributions, and population-level representations to study neural activity during behavioral tasks.
+</p>
+          <div class="proj-techs">
+            <span class="tech-tag">MATLAB</span><span class="tech-tag">GLM</span>
+            <span class="tech-tag">Neural Data Analysis</span><span class="tech-tag">Spike Sorting</span><span class="tech-tag">Visualization</span><span class="tech-tag">PCA / UMAP</span>
+          </div>
+        </div>
+      </div>
+      <div class="proj-item">
+        <div class="proj-num">02</div>
+        <div class="proj-body">
+         <h3>iEEG Preprocessing Pipeline</h3>
+          <p>Designed and implemented a scalable pipeline for preprocessing intracranial EEG recordings, incorporating artifact rejection (bad channel detection, line noise filtering), referencing (bipolar), event alignment (TTL-based), and time-frequency analysis for neural decoding and statistical modeling..</p>
+          <div class="proj-techs">
+            <span class="tech-tag">MATLAB</span><span class="tech-tag">Signal Preprocessing</span><span class="tech-tag">Visualization</span>
+          </div>
+        </div>
+      </div>
+      <div class="proj-item">
+        <div class="proj-num">03</div>
+        <div class="proj-body">
+          <h3>Affective Task-Switching Task-Design</h3>
+          <p>Modified and extended an existing affective task-switching paradigm by developing a controlled variant to isolate emotional interference effects. Implemented TTL-based event synchronization and generated structured behavioral and metadata pipelines to ensure precise alignment between neural recordings and task events.</p>
+          <div class="proj-techs">
+            <span class="tech-tag">Pych Toolbox</span><span class="tech-tag">Experimental Design</span>
+            <span class="tech-tag">Psychtoolbox</span> <span class="tech-tag">Behavioral Analysis</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-item">
+        <div class="proj-num">04</div>
+        <div class="proj-body">
+          <h3>Metadata Generation</h3>
+          <p>Developed a metadata generation pipeline to remap Neuralynx channel configurations and integrate multiple clinical data sources into a standardized structure. Organized multimodal datasets into a unified, analysis-ready format to enable efficient data access, visualization, and cross-session analysis.</p>
+          <div class="proj-techs">
+            <span class="tech-tag">MATLAB</span><span class="tech-tag">Data Structuring</span><span class="tech-tag">Automation</span>
+            <span class="tech-tag">Data Integration</span><span class="tech-tag">Visualization</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-item">
+        <div class="proj-num">05</div>
+        <div class="proj-body">
+          <h3>Task Implementation in Patient Cohorts</h3>
+          <p>Deployed the experimental task paradigm in clinical patient cohorts during intracranial recording sessions, ensuring precise stimulus delivery and TTL-synchronized acquisition of neural and behavioral data. Maintained experimental consistency across sessions in a clinical environment to support robust downstream analysis.</p>
+          <div class="proj-techs">
+            <span class="tech-tag">Neuralynx</span><span class="tech-tag">TTL Synchronization</span>
+            <span class="tech-tag">Experimental Execution</span> <span class="tech-tag">Clinical Data Acquisition</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SKILLS ═══ -->
+<section id="skills">
+  <div class="section-wrap">
+    <div class="sec-header">
+      <div class="sec-label">03 — Skills &amp; Tools</div>
+      <h2 class="sec-title">Technical <span>Expertise</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="skills-grid">
+
+  <div class="skill-group">
+    <h3>Programming</h3>
+    <div class="skill-item"><span class="skill-name">Python</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="85"></div></div></div>
+    <div class="skill-item"><span class="skill-name">MATLAB</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="95"></div></div></div>
+    <div class="skill-item"><span class="skill-name">R</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="65"></div></div></div>
+    <div class="skill-item"><span class="skill-name">C / C++</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="40"></div></div></div>
+  </div>
+
+  <div class="skill-group">
+    <h3>Neural Data / Electrophysiology</h3>
+    <div class="skill-item"><span class="skill-name">Spike Sorting (Osort / Kilosort)</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="85"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Intracranial EEG (iEEG / SEEG)</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="88"></div></div></div>
+    <div class="skill-item"><span class="skill-name">LFP Analysis</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="80"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Time-Frequency Analysis</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="90"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Behavioral Alignment / TTL Sync</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="75"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Neural Decoding</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="80"></div></div></div>
+  </div>
+
+  <div class="skill-group">
+    <h3>Neuro Tools</h3>
+    <div class="skill-item"><span class="skill-name">MNE-Python</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="90"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Kilosort</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="85"></div></div></div>
+    <div class="skill-item"><span class="skill-name">EEGLAB</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="80"></div></div></div>
+    <div class="skill-item"><span class="skill-name">FieldTrip</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="75"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Neuralynx Systems</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="85"></div></div></div>
+  </div>
+
+  <div class="skill-group">
+    <h3>Data Science / Machine Learning</h3>
+    <div class="skill-item"><span class="skill-name">scikit-learn</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="88"></div></div></div>
+    <div class="skill-item"><span class="skill-name">PyTorch</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="75"></div></div></div>
+    <div class="skill-item"><span class="skill-name">GLMs / Statistical Modeling</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="85"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Signal Processing</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="95"></div></div></div>
+    <div class="skill-item"><span class="skill-name">PCA / UMAP / Dimensionality Reduction</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="80"></div></div></div>
+  </div>
+
+  <div class="skill-group">
+    <h3>Engineering & Systems</h3>
+    <div class="skill-item"><span class="skill-name">Circuit Design</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="70"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Embedded Systems</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="65"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Linux / HPC</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="85"></div></div></div>
+    <div class="skill-item"><span class="skill-name">Git / Docker</span><div class="skill-bar-wrap"><div class="skill-bar" data-width="80"></div></div></div>
+  </div>
+
+  <div class="skill-group">
+  <h3>Statistical Modeling & Neural Data Analysis</h3>
+
+  <div class="skill-item">
+    <span class="skill-name">Generalized Linear Models (GLM)</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="92"></div></div>
+  </div>
+
+  <div class="skill-item">
+    <span class="skill-name">Hypothesis Testing (t-test, ANOVA)</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="85"></div></div>
+  </div>
+
+  <div class="skill-item">
+    <span class="skill-name">Permutation Testing</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="80"></div></div>
+  </div>
+
+  <div class="skill-item">
+    <span class="skill-name">Neural Decoding / Classification Models</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="88"></div></div>
+  </div>
+
+  <div class="skill-item">
+    <span class="skill-name">Information-Theoretic Analysis</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="75"></div></div>
+  </div>
+</div>
+  <div class="skill-group">
+  <h3>Software & Engineering Tools</h3>
+
+  <div class="skill-item">
+    <span class="skill-name">Jupyter Notebooks</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="85"></div></div>
+  </div>
+
+  <div class="skill-item">
+    <span class="skill-name">NumPy / SciPy / Pandas</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="88"></div></div>
+  </div>
+
+  <div class="skill-item">
+    <span class="skill-name">SQL (Data Querying)</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="60"></div></div>
+  </div>
+
+  <div class="skill-item">
+    <span class="skill-name">High-Performance Computing (HPC)</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="80"></div></div>
+  </div>
+
+  <div class="skill-item">
+    <span class="skill-name">Parallel Computing (MATLAB / Python)</span>
+    <div class="skill-bar-wrap"><div class="skill-bar" data-width="75"></div></div>
+  </div>
+
+</div>
+</div>
+  </div>
+</section>
+
+<!-- LAB AFFILIATIONS -->
+<section id="labs">
+  <div class="section-wrap">
+    <div class="sec-header">
+      <div class="sec-label">04 — Lab Affiliations</div>
+      <h2 class="sec-title">Where I've <span>Worked</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="lab-grid">
+      <div class="lab-card">
+        <div class="lab-header">
+          <div class="lab-icon">🏥</div>
+          <div class="lab-title">
+            <h3>Yang-laboratory; Barrow Neurological Institute</h3>
+            <div class="lab-pi">PI: Dr.Andrew I. Yang</div>
+            <div class="location">Location: Phoenix, AZ</div>
+            
+            <div class="lab-period">2024 - Present </div>
+             <div class="lab-period"> Senior Research Associate</div>
+          </div>
+        </div>
+        
+        <!-- <div class="lab-desc">iEEG preprocessing, single-unit recording analysis, affective task-switching paradigms, and epilepsy cohort studies. Add a sentence about the lab's specific focus and your contributions.</div> -->
+        <div class="lab-links">
+          <a class="lab-link" href="https://www.barrowneuro.org/for-physicians-researchers/research/research-programs-labs/neurosurgery-research/yang-laboratory/" target="_blank">🌐 Lab Website</a>
+          <!-- <a class="lab-link" href="https://github.com/LekhaVarisa" target="_blank">⬡ GitHub</a> -->
+        </div>
+      </div>
+      <div class="lab-card">
+        <div class="lab-header">
+          <div class="lab-icon">🎓</div>
+          <div class="lab-title">
+            <h3>Arizona State University</h3>
+            <div class="lab-pi">PI: Dr. Antonia</div>
+            <div class="lab-period">2022 - 2024 · Graduate Research Assistant</div>
+          </div>
+        </div>
+        <div class="lab-desc">Delivered consistent, high-quality feedback on student assignments for EEE 203: Signals and Systems I within a one-week turnaround, while managing grading workflows, coordinating schedules, and supporting efficient course operations.</div>
+        <div class="lab-links">
+          <!-- <a class="lab-link" href="#" target="_blank">🌐 Lab Website</a> -->
+          <!-- <a class="lab-link" href="https://github.com/LekhaVarisa" target="_blank">⬡ GitHub</a> -->
+        </div>
+      </div>
+      <div class="lab-card">
+        <div class="lab-header">
+          <div class="lab-icon">🔬</div>
+          <div class="lab-title">
+            <h3>Jawaharlal Institute of Technology</h3>
+            <div class="lab-pi">PI: Dr. Ch. Srinivasa Rao</div>
+            <div class="lab-period">2021 - 2022</div>
+            
+             <div class="lab-period"> Research Assistant</div>
+          </div>
+        </div>
+        <div class="lab-desc">Description of this lab's research focus and what you contributed. Add any notable projects, techniques used, or outcomes from your time here.</div>
+        <div class="lab-links">
+          <!-- <a class="lab-link" href="Research Assistantship letter" target="_blank">🌐 Research Assistantship letter</a>  -->
+          <a class="dl-btn" href="Research Assistantship letter.pdf" download> Download Letter (PDF)</a>
+          <!-- <a class="lab-link" href="https://github.com/LekhaVarisa" target="_blank">⬡ GitHub</a> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ POSTERS ═══ -->
+<section id="posters">
+  <div class="section-wrap">
+    <div class="sec-header">
+      <div class="sec-label">05 — Conference Posters</div>
+      <h2 class="sec-title">Presented <span>Work</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="poster-grid">
+
+      <div class="poster-card">
+        <div class="poster-thumb">
+          <svg width="200" height="100" viewBox="0 0 200 100">
+            <rect x="10" y="10" width="180" height="80" rx="6" fill="none" stroke="#00d4ff" stroke-width="1"/>
+            <line x1="10" y1="35" x2="190" y2="35" stroke="#00d4ff" stroke-width="0.5"/>
+            <rect x="20" y="45" width="20" height="35" fill="#00d4ff" opacity="0.3"/>
+            <rect x="50" y="55" width="20" height="25" fill="#00d4ff" opacity="0.3"/>
+            <rect x="80" y="40" width="20" height="40" fill="#00d4ff" opacity="0.5"/>
+            <rect x="110" y="50" width="20" height="30" fill="#00d4ff" opacity="0.3"/>
+            <rect x="140" y="45" width="20" height="35" fill="#00d4ff" opacity="0.4"/>
+          </svg>
+          <span class="p-label">HSN 2025</span>
+        </div>
+        <div class="poster-info">
+          <h3>Subcortical Single Unit Coding Underlying Affective Flexibility in Humans</h3>
+          <h3>Varisa, L., Nester, E., Umesh, T., Phataraphruk Rains, K., Foldes, S., & Yang, A. I.</h3>
+          <p>7th International Human Single-Neuron meeting · 2025</p>
+        </div>
+
+      </div>
+      <div class="poster-card">
+        <div class="poster-thumb">
+          <!-- Spike raster -->
+          <svg width="200" height="110" viewBox="0 0 200 110">
+            <line x1="15" y1="22" x2="185" y2="22" stroke="#00d4ff" stroke-width="0.3" opacity="0.4"/>
+            <line x1="15" y1="38" x2="185" y2="38" stroke="#00d4ff" stroke-width="0.3" opacity="0.4"/>
+            <line x1="15" y1="54" x2="185" y2="54" stroke="#00d4ff" stroke-width="0.3" opacity="0.4"/>
+            <line x1="15" y1="70" x2="185" y2="70" stroke="#00d4ff" stroke-width="0.3" opacity="0.4"/>
+            <line x1="15" y1="86" x2="185" y2="86" stroke="#00d4ff" stroke-width="0.3" opacity="0.4"/>
+            <rect x="22" y="17" width="1.5" height="9" fill="#00d4ff" opacity="0.8"/><rect x="40" y="17" width="1.5" height="9" fill="#00d4ff" opacity="0.8"/>
+            <rect x="58" y="17" width="1.5" height="9" fill="#00d4ff" opacity="0.8"/><rect x="72" y="17" width="1.5" height="9" fill="#00d4ff" opacity="0.8"/>
+            <rect x="98" y="17" width="1.5" height="9" fill="#00d4ff" opacity="0.8"/><rect x="145" y="17" width="1.5" height="9" fill="#00d4ff" opacity="0.8"/>
+            <rect x="30" y="33" width="1.5" height="9" fill="#00d4ff" opacity="0.7"/><rect x="55" y="33" width="1.5" height="9" fill="#00d4ff" opacity="0.7"/>
+            <rect x="82" y="33" width="1.5" height="9" fill="#00d4ff" opacity="0.7"/><rect x="108" y="33" width="1.5" height="9" fill="#00d4ff" opacity="0.7"/>
+            <rect x="132" y="33" width="1.5" height="9" fill="#00d4ff" opacity="0.7"/><rect x="160" y="33" width="1.5" height="9" fill="#00d4ff" opacity="0.7"/>
+            <rect x="18" y="49" width="1.5" height="9" fill="#00d4ff" opacity="0.9"/><rect x="48" y="49" width="1.5" height="9" fill="#00d4ff" opacity="0.9"/>
+            <rect x="70" y="49" width="1.5" height="9" fill="#00d4ff" opacity="0.9"/><rect x="96" y="49" width="1.5" height="9" fill="#00d4ff" opacity="0.9"/>
+            <rect x="122" y="49" width="1.5" height="9" fill="#00d4ff" opacity="0.9"/><rect x="148" y="49" width="1.5" height="9" fill="#00d4ff" opacity="0.9"/>
+            <rect x="175" y="49" width="1.5" height="9" fill="#00d4ff" opacity="0.9"/>
+          </svg>
+          <span class="p-label">SFN 2025</span>
+        </div>
+        <div class="poster-info">
+          <h3>Thalamic Rhythms Supporting Emotional Memories: Intracranial Study of the Human Pulvinar</h3>
+          <h3>Umesh, T., Phataraphruk, P. K., Varisa, L., Nester, E., Hong, J., & Yang, A. I.</>
+          <p>Society for Neuroscience · 2025</p>
+        </div>
+      </div>
+      
+      <div class="poster-card">
+        <div class="poster-thumb">
+           <!-- EEG / LFP waveform -->
+          <svg width="200" height="110" viewBox="0 0 200 110">
+            <path d="M10,55 Q20,55 25,55 Q30,55 32,35 Q34,15 36,55 Q38,75 40,55 Q55,55 60,55 Q65,55 67,33 Q69,12 71,55 Q73,77 75,55 Q90,55 95,55 Q100,55 102,37 Q104,19 106,55 Q108,73 110,55 Q125,55 130,55 Q135,55 137,31 Q139,9 141,55 Q143,79 145,55 Q160,55 165,55 Q170,55 172,38 Q174,22 176,55 Q178,72 180,55 L192,55" fill="none" stroke="#00d4ff" stroke-width="1.3" opacity="0.75"/>
+            <line x1="10" y1="55" x2="192" y2="55" stroke="#00d4ff" stroke-width="0.3" stroke-dasharray="2,5" opacity="0.25"/>
+          </svg>
+          <span class="p-label">NI 2025</span>
+        </div>
+        <div class="poster-info">
+          <h3>Intracranial Electrophysiologic Biomarkers of the Ictal Thalamocortical Network in Drug-Resistant Epilepsy</h3>
+         <h3>Nester, E., Umesh, T., Phataraphruk, P. K., Varisa, L.</>
+          <p>Neural Interfaces · 2025</p>
+        </div>
+      </div>
+      <div class="poster-card">
+  <div class="poster-thumb">
+    <!-- Connectivity / network visualization -->
+    <svg width="200" height="110" viewBox="0 0 200 110">
+      <circle cx="40" cy="30" r="6" fill="#00d4ff" opacity="0.8"/>
+      <circle cx="90" cy="20" r="6" fill="#00d4ff" opacity="0.7"/>
+      <circle cx="150" cy="35" r="6" fill="#00d4ff" opacity="0.8"/>
+      <circle cx="60" cy="75" r="6" fill="#00d4ff" opacity="0.7"/>
+      <circle cx="120" cy="85" r="6" fill="#00d4ff" opacity="0.8"/>
+      <circle cx="170" cy="70" r="6" fill="#00d4ff" opacity="0.6"/>
+
+      <line x1="40" y1="30" x2="90" y2="20" stroke="#00d4ff" stroke-width="1" opacity="0.5"/>
+      <line x1="90" y1="20" x2="150" y2="35" stroke="#00d4ff" stroke-width="1" opacity="0.5"/>
+      <line x1="40" y1="30" x2="60" y2="75" stroke="#00d4ff" stroke-width="1" opacity="0.5"/>
+      <line x1="60" y1="75" x2="120" y2="85" stroke="#00d4ff" stroke-width="1" opacity="0.5"/>
+      <line x1="120" y1="85" x2="170" y2="70" stroke="#00d4ff" stroke-width="1" opacity="0.5"/>
+      <line x1="150" y1="35" x2="170" y2="70" stroke="#00d4ff" stroke-width="1" opacity="0.5"/>
+      <line x1="90" y1="20" x2="120" y2="85" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
+    </svg>
+
+    <span class="p-label">NCACT 2020</span>
+  </div>
+
+  <div class="poster-info">
+    <h3>
+     Human Area Networking - Redtacton
+    </h3>
+    <h3>
+    </h3>
+
+    <p>NCACT 2020, India</p>
+  </div>
+</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PUBLICATIONS ═══ -->
+<section id="publications">
+  <div class="section-wrap">
+    <div class="sec-header">
+      <div class="sec-label">Theft Detection Sensing by IoT in Smart Grid</div>
+      <h2 class="sec-title">Research <span>Output</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="pub-list">
+      <div class="pub-item">
+        <h3>Subcortical Single Unit Coding Underlying Affective Flexibility in Humans</h3>
+        <div class="pub-meta">Lekha Varisa, Co-Author, PI Name · Journal Name: TBD · 2026</div>
+        <span class="pub-badge">In Preparation</span>
+      </div>
+      <div class="pub-item">
+        <h3>
+    Theft Detection Sensing by IoT in Smart Grid
+  </h3>
+  <div class="pub-meta">
+    N. S. M. Rao, M. Ramu, Lekha Varisa · 
+    Wiley Book Chapter · 2023
+  </div>
+  <span class="pub-badge">Published</span>
+      </div>
+      <div class="pub-item">
+  <h3>
+    Energy Metering and Billing Systems Using Arduino
+  </h3>
+  <div class="pub-meta">
+    M. Ramu, Lekha Varisa, N. S. M. Rao · 
+    Wiley Book Chapter · 2023
+  </div>
+  <span class="pub-badge">Published</span>
+</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CV ═══ -->
+<section id="cv">
+  <div class="section-wrap">
+    <div class="sec-header">
+      <div class="sec-label">07 — Experience &amp; Education</div>
+      <h2 class="sec-title">My <span>Background</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="cv-cols">
+      <div class="cv-col">
+        <h3>Experience</h3>
+        <div class="cv-item">
+          <div class="role">Senior Research Associate</div>
+          <div class="org">Barrow Neurological Institute | Dignity Health </div>
+          <div class="period">2024 - Present</div>
+          <div class="desc">iEEG data preprocessing, single-unit analysis, affective task-switching paradigms, epilepsy cohort studies.</div>
+        </div>
+        <div class="cv-item">
+          <div class="role">Graduate Research Assistant</div>
+          <div class="org"> Arizona state University</div>
+         
+          <div class="period">2023 - 2024</div>
+           <div class="desc">Supported Signals and Systems and Time-Frequency Signal Processing courses through grading, coursework assistance, and student mentoring.</div>
+        
+          <div class="desc"></div>
+        </div>
+        <div class="cv-item">
+          <div class="role">Research Assistant</div>
+          <div class="org">Jawaharlal Nehru Technological University</div>
+          <div class="period">2021-2022</div>
+          <div class="desc">Literature review and analysis on image and signal processing methods.</div>
+        </div>
+      </div>
+      <div class="cv-col">
+        <h3>Education</h3>
+        <div class="cv-item">
+          <div class="role">MicroMasters in Business Administration</div>
+          <div class="org">Indian Institute of Management Bangalore (Online)</div>
+          <div class="period">Graduated 2026</div>
+          <div class="desc"> Focus on data-driven decision-making, business analytics, and operations management with quantitative and analytical frameworks.</div>
+   <a class="dl-btn" href="MicroMasters _ edX Credentials.pdf" download>↓ Download Certificate (PDF)</a>
+   
+        </div>
+        <div class="cv-item">
+          <div class="role">M.S. Computer(Electrical) Engineering</div>
+          <div class="org">Arizona State University</div>
+          <div class="period">Graduated 2024</div>
+          <div class="desc">Coursework in machine learning, signal processing, and data-driven systems with applications to neural and biomedical data analysis.</div>    
+           <a class="dl-btn" href="Original degree certificate.pdf" download>↓ Download Certificate (PDF)</a>
+        </div>
+
+        <div class="cv-item">
+          <div class="role">B.Tech. Electronics & Communications</div>
+          <div class="org">Gandhi Instituite of Technology and Management University</div>
+          <div class="period">Graduated 2021</div>
+          <div class="desc">Focused on signal processing, embedded systems, and computational methods, later transitioning into neural data science and intracranial signal analysis.</div>
+           <a class="dl-btn" href="Btech OD.pdf" download>↓ Download Certificate (PDF)</a>
+        </div>
+      </div>
+    </div>
+    <a class="dl-btn" href="resume-1.pdf" download>↓ Download Full CV (PDF)</a>
+    <a class="dl-btn" href="resume-1.pdf" download>↓ Download Full Resume (PDF)</a>
+  
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section id="contact">
+  <div class="section-wrap">
+    <div class="sec-header">
+      <div class="sec-label">08 — Contact</div>
+      <h2 class="sec-title">Let's <span>Connect</span></h2>
+      <div class="sec-line"></div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-text">
+        <p>
+          I'm actively seeking PhD positions in computational and systems neuroscience,
+          and open to research collaborations and industry roles in neurotech and BCI.
+          Feel free to reach out about any of the above.
+        </p>
+        <div class="contact-links">
+          <!-- Replace # with real links -->
+          <a class="c-link" href="mailto:lekhasahi@gmail.com"><span class="c-icon">@</span> lekhasahi@gmail.com</a>
+          <a class="c-link" href="https://www.linkedin.com/in/lekha-varisa/" target="_blank"><span class="c-icon">in</span> https://www.linkedin.com/in/lekha-varisa/</a>
+          <!-- <a class="c-link" href="https://github.com/Lekha_Varias" target="_blank"><span class="c-icon">g</span> github.com/Lekha_Varias</a> -->
+          </div>
+      </div>
+      <form class="contact-form" id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="1d7196c2-e053-4dfc-b6ed-c6731f15f09d">
+        <input type="hidden" name="subject" value="New message from your portfolio">
+        <input type="hidden" name="from_name" value="Portfolio Contact Form">
+        <input type="checkbox" name="botcheck" style="display:none;">
+        <input type="text" name="name" placeholder="Your name" required />
+        <input type="email" name="email" placeholder="Your email" required />
+        <textarea name="message" placeholder="Your message — PhD inquiries, collaborations, opportunities..." required></textarea>
+        <button type="submit">Send Message →</button>
+        <p id="formResult" style="font-size:13px; margin-top:6px; color:var(--cyan); display:none;"></p>
+      </form>
+      <script>
+        const form = document.getElementById('contactForm');
+        const result = document.getElementById('formResult');
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const btn = form.querySelector('button[type="submit"]');
+          btn.disabled = true;
+          btn.textContent = 'Sending...';
+          fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            body: new FormData(form)
+          }).then(res => res.json()).then(data => {
+            if (data.success) {
+              result.style.display = 'block';
+              result.style.color = 'var(--cyan)';
+              result.textContent = 'Message sent! I\'ll get back to you soon.';
+              form.reset();
+            } else {
+              result.style.display = 'block';
+              result.style.color = '#ff6b6b';
+              result.textContent = 'Something went wrong. Please try again or email me directly.';
+            }
+            btn.disabled = false;
+            btn.textContent = 'Send Message →';
+          }).catch(() => {
+            result.style.display = 'block';
+            result.style.color = '#ff6b6b';
+            result.textContent = 'Something went wrong. Please try again or email me directly.';
+            btn.disabled = false;
+            btn.textContent = 'Send Message →';
+          });
+        });
+      </script>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>· Built with curiosity, caffeine &amp; claude ·</p>
+</footer>
+
+</div><!-- end #main -->
+
+<script>
+
+  /* ── Skill bar animation on scroll ── */
+const skillObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.skill-bar').forEach(bar => {
+        const w = bar.getAttribute('data-width');
+        bar.style.width = w + '%';
+      });
+      skillObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+
+const skillsSection = document.getElementById('skills');
+if (skillsSection) skillObserver.observe(skillsSection);
+
+/* ── Animated background neural network ── */
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+
+function resizeBg() {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+}
+resizeBg();
+window.addEventListener('resize', resizeBg);
+
+const nodes = Array.from({length: 65}, () => ({
+  x: Math.random() * window.innerWidth,
+  y: Math.random() * window.innerHeight,
+  vx: (Math.random() - 0.5) * 0.35,
+  vy: (Math.random() - 0.5) * 0.35,
+  r: Math.random() * 2 + 1
+}));
+const spikeTrains = Array.from({length: 6}, (_, i) => ({
+  y: window.innerHeight * (0.08 + i * 0.16),
+  spikes: Array.from({length: 20}, () => ({ x: Math.random() * window.innerWidth, h: 5 + Math.random() * 9 })),
+  vx: 0.18 + Math.random() * 0.12
+}));
+function drawBg() {
+  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+  spikeTrains.forEach(train => {
+    train.spikes.forEach(s => {
+      s.x -= train.vx;
+      if (s.x < -4) { s.x = bgCanvas.width + 5; s.h = 5 + Math.random() * 9; }
+      bgCtx.fillStyle = 'rgba(0,255,280,0.1)';
+      bgCtx.fillRect(s.x, train.y - s.h/2, 4, s.h);
+    });
+  });
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > bgCanvas.width) n.vx *= -1;
+    if (n.y < 0 || n.y > bgCanvas.height) n.vy *= -1;
+  });
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        bgCtx.beginPath();
+        bgCtx.strokeStyle = `rgba(0,212,255,${0.4 * (1 - dist / 120)})`;
+        bgCtx.lineWidth = 0.55;
+        bgCtx.moveTo(nodes[i].x, nodes[i].y);
+        bgCtx.lineTo(nodes[j].x, nodes[j].y);
+        bgCtx.stroke();
+      }
+    }
+    bgCtx.beginPath();
+    bgCtx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, Math.PI * 2);
+    bgCtx.fillStyle = 'rgba(0,212,255,0.5)';
+    bgCtx.fill();
+  }
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+
+
+
+/* ── Hero neural canvas ── */
+const heroCanvas = document.getElementById('heroCanvas');
+if (heroCanvas) {
+  const hCtx = heroCanvas.getContext('2d');
+  heroCanvas.width = 380; heroCanvas.height = 380;
+  const hNodes = Array.from({length: 24}, () => ({
+    x: 50 + Math.random() * 280,
+    y: 50 + Math.random() * 280,
+    vx: (Math.random() - 0.5) * 0.55,
+    vy: (Math.random() - 0.5) * 0.55,
+    r: Math.random() * 3 + 2,
+    spike: Math.random() < 0.3
+  }));
+  function drawHero() {
+    hCtx.clearRect(0, 0, 380, 380);
+    for (let i = 0; i < hNodes.length; i++) {
+      hNodes[i].x += hNodes[i].vx; hNodes[i].y += hNodes[i].vy;
+      if (hNodes[i].x < 30 || hNodes[i].x > 350) hNodes[i].vx *= -1;
+      if (hNodes[i].y < 30 || hNodes[i].y > 350) hNodes[i].vy *= -1;
+      for (let j = i + 1; j < hNodes.length; j++) {
+        const dx = hNodes[i].x - hNodes[j].x;
+        const dy = hNodes[i].y - hNodes[j].y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 130) {
+          hCtx.beginPath();
+          hCtx.strokeStyle = `rgba(0,212,255,${0.7 * (1 - d / 130)})`;
+          hCtx.lineWidth = 1.5;
+          hCtx.moveTo(hNodes[i].x, hNodes[i].y);
+          hCtx.lineTo(hNodes[j].x, hNodes[j].y);
+          hCtx.stroke();
+        }
+      }
+      hCtx.beginPath();
+      hCtx.arc(hNodes[i].x, hNodes[i].y, hNodes[i].r, 0, Math.PI * 2);
+      hCtx.fillStyle = hNodes[i].spike ? 'rgba(0,255,255,0.9)' : 'rgba(0,255,255,0.8)';
+      hCtx.fill();
+      if (hNodes[i].spike) {
+        hCtx.beginPath();
+        hCtx.arc(hNodes[i].x, hNodes[i].y, hNodes[i].r + 5, 0, Math.PI * 2);
+        hCtx.strokeStyle = 'rgba(0,200,255,0.78)';
+        hCtx.lineWidth = 1.5;
+        hCtx.stroke();
+      }
+    }
+    requestAnimationFrame(drawHero);
+  }
+  drawHero();
+}
+
+
+
+</script>
+
+</body>
+</html>
+
+
+
+<!-- stuuf i need
+ 1. section-4: downloadable LOR
+ 2. 
+
+
+-->
